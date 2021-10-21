@@ -1,4 +1,5 @@
 using Prometheus;
+using Server.System;
 using Server.Web.Structures;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,9 @@ namespace Server.Web.Handlers {
   public class MetricsHandler : IHttpRequestHandler {
     private readonly ServerInformation ServerInformation = null;
 
-    private Gauge PlayerCount;
-    private Gauge SubspaceCount;
+    private Counter PlayerInfo;
+
+    private Counter SubspaceEpoch;
 
     private Counter VesselEpoch;
     private Counter VesselDistanceTravelled;
@@ -30,19 +32,25 @@ namespace Server.Web.Handlers {
     private Gauge VesselLongitudeOfAscendingNode;
     private Gauge VesselMeanAnomaly;
 
+    private Counter ScenarioInfo;
+    private Gauge ScenarioScience;
+    private Gauge ScenarioFunds;
+    private Gauge ScenarioReputation;
+
     public MetricsHandler(ServerInformation serverInformation) {
       ServerInformation = serverInformation;
 
-      CounterConfiguration VesselCounterConfiguration = new CounterConfiguration{
-        LabelNames = new[] {"id", "name", "type"}
-      };
-      GaugeConfiguration VesselGaugeConfiguration = new GaugeConfiguration{
-        LabelNames = new[] {"id", "name", "type"}
-      };
-
       // General metrics.
-      PlayerCount = Metrics.CreateGauge("lmp_players_online_total", "The total number of players currently online.");
-      SubspaceCount = Metrics.CreateGauge("lmp_subspace_total", "The total number of individual subspaces.");
+      PlayerInfo = Metrics.CreateCounter(
+        "lmp_player_info",
+        "Information about each player currently in the universe.",
+        new CounterConfiguration{LabelNames = new[] {"name"}}
+      );
+      SubspaceEpoch = Metrics.CreateCounter(
+        "lmp_subspace_epoch",
+        "The current epoch of the subspace.",
+        new CounterConfiguration{LabelNames = new[] {"creator"}}
+      );
 
       // Vessel general metrics.
       VesselDistanceTravelled = Metrics.CreateCounter(
@@ -106,19 +114,47 @@ namespace Server.Web.Handlers {
         "The vessel's mean anomaly.",
         new GaugeConfiguration{LabelNames = new[] {"body", "id", "name", "type"}}
       );
+
+      // Space program metrics.
+      ScenarioInfo = Metrics.CreateCounter(
+        "lmp_scenario_info",
+        "Information about the current scenario.",
+        new CounterConfiguration{
+          LabelNames = new[] {
+            "name",
+            "type",
+          }
+        }
+      );
+      ScenarioScience = Metrics.CreateGauge(
+        "lmp_scenario_science_total",
+        "The scenario's current total science."
+      );
+      ScenarioFunds = Metrics.CreateGauge(
+        "lmp_scenario_funds_total",
+        "The scenario's current total funds."
+      );
+      ScenarioReputation = Metrics.CreateGauge(
+        "lmp_scenario_reputation_total",
+        "The scenario's current total reputation."
+      );
     }
 
     public Task Handle(IHttpContext context, Func<Task> next) {
-      // TODO: time to get scrape duration.
-
       // Set general metrics.
-      PlayerCount.Set(ServerInformation.CurrentState.CurrentPlayers.Count);
-      SubspaceCount.Set(ServerInformation.CurrentState.Subspaces.Count);
+      foreach(var player in ServerInformation.CurrentState.CurrentPlayers) {
+        PlayerInfo.WithLabels(player).IncTo(1);
+      }
+      foreach(var subpsace in ServerInformation.CurrentState.Subspaces) {
+        SubspaceEpoch.WithLabels(subpsace.Creator).IncTo(subpsace.Time);
+      }
 
       // Set vessel metrics.
       foreach(var vessel in ServerInformation.CurrentState.CurrentVessels) {
         var identifier = vessel.Id.ToString();
-        var body = BodyMapper.Mapping[vessel.ReferenceBody];
+        if(!BodyMapper.Mapping.TryGetValue(vessel.ReferenceBody, out var body)) {
+          body = "Unknown";
+        }
 
         // Set vessel general metrics.
         VesselEpoch.WithLabels(identifier, vessel.Name, vessel.Type).IncTo(vessel.Epoch);
@@ -140,6 +176,24 @@ namespace Server.Web.Handlers {
         VesselMeanAnomaly.WithLabels(body, identifier, vessel.Name, vessel.Type).Set(vessel.MeanAnomaly);
       }
 
+      // Set space program metrics.
+      if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("ResearchAndDevelopment", out var rnd)) {
+        if(double.TryParse(rnd.GetValue("sci").Value, out var result)) {
+          ScenarioScience.Set(result);
+        }
+      }
+      if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("Funding", out var funding)) {
+        if(double.TryParse(funding.GetValue("funds").Value, out var result)) {
+          ScenarioFunds.Set(result);
+        }
+      }
+      if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("Reputation", out var reputation)) {
+        if(double.TryParse(funding.GetValue("rep").Value, out var result)) {
+          ScenarioReputation.Set(result);
+        }
+      }
+      
+      // Write out the Prometheus metrics to the response.
       var stream = new MemoryStream();
       Metrics.DefaultRegistry.CollectAndExportAsTextAsync(stream);
       context.Response = new HttpResponse("text/plain; version=0.0.4", stream, false);
