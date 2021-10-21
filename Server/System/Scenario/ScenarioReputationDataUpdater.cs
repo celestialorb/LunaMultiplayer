@@ -17,6 +17,8 @@ namespace Server.System.Scenario
                     if (!ScenarioStoreSystem.CurrentScenarios.TryGetValue("Reputation", out var scenario)) return;
 
                     scenario.UpdateValue("rep", reputationPoints.ToString(CultureInfo.InvariantCulture));
+
+                    Metrics.Scenario.Reputation.Set(reputationPoints);
                 }
             });
         }

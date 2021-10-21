@@ -21,6 +21,8 @@ namespace Server.Client
 
             ServerContext.Clients.TryAdd(newClientObject.Endpoint, newClientObject);
             LunaLog.Debug($"Online Players: {ServerContext.PlayerCount}, connected: {ServerContext.Clients.Count}");
+
+            Metrics.Player.Online.WithLabels(newClientObject.PlayerName).Set(1);
         }
 
         public static void DisconnectClient(ClientStructure client, string reason = "")
@@ -57,9 +59,12 @@ namespace Server.Client
                 {
                     LunaLog.Error($"Error closing client Connection: {e.Message}");
                 }
+                finally {
+                    Metrics.Player.Online.RemoveLabelled(new[] {client.PlayerName});
+                }
             }
 
-            //As this is the last client that is connected to the server, run a safety backup once he disconnects
+            //As this is the last client that is connected to the server, run a safety backup once they disconnects
             if (ServerContext.Clients.Count == 0)
             {
                 BackupSystem.RunBackup();

@@ -65,6 +65,24 @@ namespace Server.System.Vessel
                         vessel.Orbit.Update("MNA", msgData.Orbit[5].ToString(CultureInfo.InvariantCulture));
                         vessel.Orbit.Update("EPH", msgData.Orbit[6].ToString(CultureInfo.InvariantCulture));
                         vessel.Orbit.Update("REF", msgData.Orbit[7].ToString(CultureInfo.InvariantCulture));
+
+                        var labels = new[] {
+                            msgData.VesselId.ToString(),
+                            vessel.Fields.GetSingle("name").Value,
+                            vessel.Fields.GetSingle("type").Value
+                        };
+
+                        Metrics.Vessel.Latitude.WithLabels(labels).Set(msgData.LatLonAlt[0]);
+                        Metrics.Vessel.Longitude.WithLabels(labels).Set(msgData.LatLonAlt[1]);
+                        Metrics.Vessel.Altitude.WithLabels(labels).Set(msgData.LatLonAlt[2]);
+
+                        Metrics.Vessel.SemimajorAxis.WithLabels(labels).Set(msgData.Orbit[2]);
+                        Metrics.Vessel.Eccentricity.WithLabels(labels).Set(msgData.Orbit[1]);
+                        Metrics.Vessel.Inclination.WithLabels(labels).Set(msgData.Orbit[0]);
+                        Metrics.Vessel.ArgumentOfPeriapsis.WithLabels(labels).Set(msgData.Orbit[4]);
+                        Metrics.Vessel.LongitudeOfAscendingNode.WithLabels(labels).Set(msgData.Orbit[3]);
+                        Metrics.Vessel.MeanAnomaly.WithLabels(labels).Set(msgData.Orbit[5]);
+                        Metrics.Vessel.Epoch.WithLabels(labels).Set(msgData.Orbit[7]);
                     }
                 });
             }

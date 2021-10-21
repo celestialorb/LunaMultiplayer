@@ -17,6 +17,8 @@ namespace Server.System.Scenario
                     if (!ScenarioStoreSystem.CurrentScenarios.TryGetValue("ResearchAndDevelopment", out var scenario)) return;
 
                     scenario.UpdateValue("sci", sciencePoints.ToString(CultureInfo.InvariantCulture));
+
+                    Metrics.Scenario.Science.Set(sciencePoints);
                 }
             });
         }

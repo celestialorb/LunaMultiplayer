@@ -17,6 +17,8 @@ namespace Server.System.Scenario
                     if (!ScenarioStoreSystem.CurrentScenarios.TryGetValue("Funding", out var scenario)) return;
 
                     scenario.UpdateValue("funds", funds.ToString(CultureInfo.InvariantCulture));
+
+                    Metrics.Scenario.Funds.Set(funds);
                 }
             });
         }
