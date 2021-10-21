@@ -1,4 +1,5 @@
 ﻿using LmpCommon.Message.Data.Vessel;
+using Server.Metrics;
 using System;
 using System.Collections.Concurrent;
 using System.Globalization;
@@ -42,6 +43,18 @@ namespace Server.System.Vessel
                     {
                         if (!VesselStoreSystem.CurrentVessels.TryGetValue(msgData.VesselId, out var vessel)) return;
 
+                        // Check for a staging event.
+                        // NOTE: If there is a better way to detect a staging event, let me know.
+                        var currentStage = vessel.Fields.GetSingle("stg").Value;
+                        var updatedStage = msgData.Stage.ToString(CultureInfo.InvariantCulture);
+                        if(currentStage != updatedStage) {
+                            Metrics.Vessel.StagingEvent.WithLabels(
+                                msgData.VesselId.ToString(),
+                                msgData.Name,
+                                msgData.Stage.ToString()
+                            ).IncTo(DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                        }
+
                         vessel.Fields.Update("name", msgData.Name);
                         vessel.Fields.Update("type", msgData.Type);
                         vessel.Fields.Update("distanceTraveled", msgData.DistanceTraveled.ToString(CultureInfo.InvariantCulture));
@@ -59,6 +72,8 @@ namespace Server.System.Vessel
                         vessel.Fields.Update("clnRsn", msgData.AutoCleanReason);
                         vessel.Fields.Update("ctrl", msgData.WasControllable.ToString(CultureInfo.InvariantCulture));
                         vessel.Fields.Update("stg", msgData.Stage.ToString(CultureInfo.InvariantCulture));
+
+                        Metrics.Vessel.DistanceTraveled.IncTo(msgData.DistanceTraveled);
 
                         //NEVER! patch the CoM in the protovessel as then it will be drawn with incorrect CommNet lines!
                         //vessel.Fields.Update("CoM", $"{msgData.Com[0].ToString(CultureInfo.InvariantCulture)}," +
