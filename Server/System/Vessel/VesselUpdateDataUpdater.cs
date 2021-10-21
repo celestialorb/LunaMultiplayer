@@ -48,6 +48,7 @@ namespace Server.System.Vessel
                         var currentStage = vessel.Fields.GetSingle("stg").Value;
                         var updatedStage = msgData.Stage.ToString(CultureInfo.InvariantCulture);
                         if(currentStage != updatedStage) {
+                            Log.LunaLog.Info($"detected a staging event {msgData.VesselId.ToString()}");
                             Metrics.Vessel.StagingEvent.WithLabels(
                                 msgData.VesselId.ToString(),
                                 msgData.Name,
