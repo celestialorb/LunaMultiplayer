@@ -15,6 +15,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine as builder
 
 COPY . /LunaMultiplayer
 RUN cd LunaMultiplayer/Server && \
+    dotnet add package prometheus-net && \
     dotnet publish -r linux-musl-x64 -o Publish
 
 FROM alpine:edge
