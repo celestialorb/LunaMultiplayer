@@ -1,4 +1,4 @@
-using LmpCommon.Message.Data.Vessel;
+﻿using LmpCommon.Message.Data.Vessel;
 using Server.Metrics;
 using System;
 using System.Collections.Concurrent;
@@ -75,7 +75,11 @@ namespace Server.System.Vessel
                         vessel.Fields.Update("ctrl", msgData.WasControllable.ToString(CultureInfo.InvariantCulture));
                         vessel.Fields.Update("stg", msgData.Stage.ToString(CultureInfo.InvariantCulture));
 
-                        Metrics.Vessel.DistanceTraveled.IncTo(msgData.DistanceTraveled);
+                        Metrics.Vessel.DistanceTraveled.WithLabels(
+                            msgData.VesselId.ToString(),
+                            msgData.Name,
+                            msgData.Type
+                        ).Set(msgData.DistanceTraveled);
 
                         //NEVER! patch the CoM in the protovessel as then it will be drawn with incorrect CommNet lines!
                         //vessel.Fields.Update("CoM", $"{msgData.Com[0].ToString(CultureInfo.InvariantCulture)}," +
