@@ -76,6 +76,26 @@ namespace Server.Metrics {
       new Prometheus.GaugeConfiguration{LabelNames = LabelNames}
     );
 
+    public static readonly Prometheus.Gauge ResourceAmount = Prometheus.Metrics.CreateGauge(
+      "lmp_vessel_part_resource_amount",
+      "The amount of resources in a vessel part.",
+      new Prometheus.GaugeConfiguration{LabelNames = new[] {
+        "id",
+        "resource_name",
+        "part_id"
+      }}
+    );
+
+    public static readonly Prometheus.Gauge ResourceFlow = Prometheus.Metrics.CreateGauge(
+      "lmp_vessel_part_resource_flow",
+      "The vessel part's state of resource flow.",
+      new Prometheus.GaugeConfiguration{LabelNames = new[] {
+        "id",
+        "resource_name",
+        "part_id"
+      }}
+    );
+
     public static void Init() {}
   }
 }
