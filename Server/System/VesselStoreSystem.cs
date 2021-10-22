@@ -28,6 +28,7 @@ namespace Server.System
         public static void RemoveVessel(Guid vesselId)
         {
             CurrentVessels.TryRemove(vesselId, out _);
+            Metrics.Vessel.RemoveVessel(vesselId);
 
             Task.Run(() =>
             {

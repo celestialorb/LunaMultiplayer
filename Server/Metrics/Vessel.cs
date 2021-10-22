@@ -1,4 +1,4 @@
-using Prometheus;
+using System;
 
 namespace Server.Metrics {
   public class Vessel {
@@ -97,5 +97,41 @@ namespace Server.Metrics {
     );
 
     public static void Init() {}
+
+    public static void RemoveVessel(Guid vesselId) {
+      var id = vesselId.ToString();
+
+      // TODO: investigate if this can be done with reflection?
+      // TODO: maybe split resources into another class.
+
+      // Get label values from the epoch metric and remove all orbital and positional information.
+      foreach(var labels in Epoch.GetAllLabelValues()) {
+        if(id == labels[0]) {
+          // Remove labeled metrics from all vessel metrics.
+          Epoch.RemoveLabelled(labels);
+
+          Latitude.RemoveLabelled(labels);
+          Longitude.RemoveLabelled(labels);
+          Altitude.RemoveLabelled(labels);
+
+          SemimajorAxis.RemoveLabelled(labels);
+          Eccentricity.RemoveLabelled(labels);
+          Inclination.RemoveLabelled(labels);
+
+          ArgumentOfPeriapsis.RemoveLabelled(labels);
+          LongitudeOfAscendingNode.RemoveLabelled(labels);
+          MeanAnomaly.RemoveLabelled(labels);
+
+          ResourceAmount.RemoveLabelled(labels);
+          ResourceFlow.RemoveLabelled(labels);
+        }
+      }
+
+      // Get label values from the resource flow metric and remove all resource information.
+      foreach(var labels in ResourceFlow.GetAllLabelValues()) {
+        ResourceAmount.RemoveLabelled(labels);
+        ResourceFlow.RemoveLabelled(labels);
+      }
+    }
   }
 }
