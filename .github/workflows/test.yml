@@ -4,4 +4,4 @@ jobs:
   build-container-image:
     runs-on: ubuntu-latest
     steps:
-      - echo "just a test"
+      - run: echo "just a test"
