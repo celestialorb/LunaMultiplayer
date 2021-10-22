@@ -46,6 +46,12 @@ namespace Server.System
                 return false;
 
             LunaLog.Debug($"Removing abandoned subspace '{subspaceToRemove}'");
+            
+            WarpContext.Subspaces.TryGetValue(subspaceToRemove, out Subspace subspace);
+            Metrics.Subspace.Delta.RemoveLabelled(
+                subspace.Id.ToString(),
+                subspace.Creator    
+            );
             WarpContext.Subspaces.TryRemove(subspaceToRemove, out _);
             return true;
         }
