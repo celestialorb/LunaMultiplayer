@@ -37,6 +37,8 @@ namespace Server.System.Scenario
                                 scenariosParentNode.AddNode(contract);
                             }
                         }
+
+                        Metrics.Contracts.Init();
                     }
                 }
             });
