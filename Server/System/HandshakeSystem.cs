@@ -46,6 +46,7 @@ namespace Server.System
                 MessageQueuer.RelayMessage<PlayerConnectionSrvMsg>(client, msgData);
 
                 LunaLog.Debug($"Online Players: {ServerContext.PlayerCount}, connected: {ClientRetriever.GetClients().Length}");
+                Metrics.Player.Online.WithLabels(msgData.PlayerName).Set(1);
             }
         }
     }
