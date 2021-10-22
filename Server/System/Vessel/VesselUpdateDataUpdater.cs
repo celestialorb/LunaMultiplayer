@@ -1,4 +1,4 @@
-﻿using LmpCommon.Message.Data.Vessel;
+using LmpCommon.Message.Data.Vessel;
 using Server.Metrics;
 using System;
 using System.Collections.Concurrent;
@@ -52,7 +52,8 @@ namespace Server.System.Vessel
                             Metrics.Vessel.StagingEvent.WithLabels(
                                 msgData.VesselId.ToString(),
                                 msgData.Name,
-                                msgData.Stage.ToString()
+                                msgData.Stage.ToString(),
+                                msgData.Type
                             ).IncTo(DateTimeOffset.Now.ToUnixTimeMilliseconds());
                         }
 
