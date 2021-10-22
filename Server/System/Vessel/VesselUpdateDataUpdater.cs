@@ -1,4 +1,4 @@
-﻿using LmpCommon.Message.Data.Vessel;
+using LmpCommon.Message.Data.Vessel;
 using Server.Metrics;
 using System;
 using System.Collections.Concurrent;
@@ -45,10 +45,10 @@ namespace Server.System.Vessel
 
                         // Check for a staging event.
                         // NOTE: If there is a better way to detect a staging event, let me know.
-                        var currentStage = vessel.Fields.GetSingle("stg").Value;
-                        var updatedStage = msgData.Stage.ToString(CultureInfo.InvariantCulture);
-                        if(currentStage != updatedStage) {
-                            Log.LunaLog.Info($"detected a staging event {msgData.VesselId.ToString()}");
+                        int.TryParse(vessel.Fields.GetSingle("stg").Value, out int currentStage);
+                        if(msgData.Stage < currentStage)
+                        {
+                            Log.LunaLog.Debug($"detected a staging event {msgData.VesselId.ToString()}");
                             Metrics.Vessel.StagingEvent.WithLabels(
                                 msgData.VesselId.ToString(),
                                 msgData.Name,
