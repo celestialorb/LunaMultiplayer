@@ -1,4 +1,4 @@
-﻿using LmpCommon.Message.Data.Vessel;
+using LmpCommon.Message.Data.Vessel;
 using System;
 using System.Collections.Concurrent;
 using System.Globalization;
@@ -53,6 +53,18 @@ namespace Server.System.Vessel
                                 {
                                     resourceNode.UpdateValue("amount", resource.Amount.ToString(CultureInfo.InvariantCulture));
                                     resourceNode.UpdateValue("flowState", resource.FlowState.ToString(CultureInfo.InvariantCulture));
+
+                                    // NOTE: skipping this resource as I doubt anyone will want to see it.
+                                    if(resource.ResourceName == "RefundingForKSP111x") { continue; }
+
+                                    var labels = new string[] {
+                                        msgData.VesselId.ToString(),
+                                        resource.ResourceName,
+                                        resource.PartFlightId.ToString()
+                                    };
+
+                                    Metrics.Vessel.ResourceAmount.WithLabels(labels).Set(resource.Amount);
+                                    Metrics.Vessel.ResourceFlow.WithLabels(labels).Set(resource.FlowState ? 1 : 0);
                                 }
                             }
                         }
