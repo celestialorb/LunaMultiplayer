@@ -28,6 +28,11 @@ namespace Server.System
                 msgData.PlayerCreator = message.PlayerCreator;
                 msgData.SubspaceKey = WarpContext.NextSubspaceId;
 
+                Metrics.Subspace.Delta.WithLabels(
+                    msgData.SubspaceKey.ToString(),
+                    msgData.PlayerCreator
+                ).Set(msgData.ServerTimeDifference);
+
                 MessageQueuer.SendToAllClients<WarpSrvMsg>(msgData);
                 WarpContext.NextSubspaceId++;
             }
