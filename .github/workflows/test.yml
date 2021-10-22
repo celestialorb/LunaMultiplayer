@@ -4,4 +4,4 @@ jobs:
   build-container-image:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "just a test"
+      - run: docker build -t test -f Dockerfile_Server .
