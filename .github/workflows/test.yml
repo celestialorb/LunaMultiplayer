@@ -8,6 +8,6 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          file: "{context}/Dockerfile_Server"
+          file: "Dockerfile_Server"
           push: true
           tags: user/app:latest
