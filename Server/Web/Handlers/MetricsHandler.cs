@@ -12,6 +12,7 @@ namespace Server.Web.Handlers {
       Prometheus.Metrics.SuppressDefaultMetrics();
 
       // Initialize the various metric subsystems.
+      Metrics.Contracts.Init();
       Metrics.Player.Init();
       Metrics.Scenario.Init();
       Metrics.Subspace.Init();
