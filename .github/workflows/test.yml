@@ -4,4 +4,8 @@ jobs:
   build-container-image:
     runs-on: ubuntu-latest
     steps:
-      - run: docker build -t test -f Dockerfile_Server .
+      - name: Checkout Project
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
