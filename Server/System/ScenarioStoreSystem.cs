@@ -47,6 +47,24 @@ namespace Server.System
                     ScenarioDataUpdater.WriteReputationDataToFile(GameplaySettings.SettingsStore.StartingReputation);
                     ScenarioDataUpdater.WriteFundsDataToFile(GameplaySettings.SettingsStore.StartingFunds);
                 }
+
+                // Update funds metric.
+                if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("Funding", out var funding)) {
+                    double.TryParse(funding.GetValue("funds").Value, out double result);
+                    Metrics.Scenario.Funds.Set(result);
+                }
+
+                // Update reputation metric.
+                if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("Reputation", out var reputation)) {
+                    double.TryParse(reputation.GetValue("rep").Value, out double result);
+                    Metrics.Scenario.Reputation.Set(result);
+                }
+
+                // Update science metric.
+                if(ScenarioStoreSystem.CurrentScenarios.TryGetValue("ResearchAndDevelopment", out var rnd)) {
+                    double.TryParse(rnd.GetValue("sci").Value, out double result);
+                    Metrics.Scenario.Science.Set(result);
+                }
             }
         }
 
