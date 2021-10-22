@@ -1,0 +1,7 @@
+name: Container Image Publish
+on: [push]
+jobs:
+  build-container-image:
+    runs-on: ubuntu-latest
+    steps:
+      - echo "just a test"
