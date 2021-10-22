@@ -13,6 +13,7 @@ namespace Server.Web.Handlers {
 
       // Initialize the various metric subsystems.
       Metrics.Contracts.Init();
+      // Metrics.Kerbals.Init();
       Metrics.Player.Init();
       Metrics.Scenario.Init();
       Metrics.Subspace.Init();
