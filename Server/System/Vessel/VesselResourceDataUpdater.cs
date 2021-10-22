@@ -1,4 +1,4 @@
-using LmpCommon.Message.Data.Vessel;
+﻿using LmpCommon.Message.Data.Vessel;
 using System;
 using System.Collections.Concurrent;
 using System.Globalization;
