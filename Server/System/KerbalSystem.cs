@@ -30,6 +30,7 @@ namespace Server.System
             FileHandler.WriteToFile(path, data.Kerbal.KerbalData, data.Kerbal.NumBytes);
 
             MessageQueuer.RelayMessage<KerbalSrvMsg>(client, data);
+            Metrics.Kerbals.Info.WithLabels(data.Kerbal.KerbalName).Set(1);
         }
 
         public static void HandleKerbalsRequest(ClientStructure client)
@@ -62,6 +63,26 @@ namespace Server.System
             FileHandler.FileDelete(Path.Combine(KerbalsPath, $"{kerbalToRemove}.txt"));
 
             MessageQueuer.RelayMessage<KerbalSrvMsg>(client, message);
+
+            Metrics.Kerbals.Info.RemoveLabelled(message.KerbalName);
+        }
+
+        public static void InitializeKerbalMetrics() {
+            var kerbalFiles = FileHandler.GetFilesInPath(KerbalsPath);
+            var kerbalsData = kerbalFiles.Select(k =>
+            {
+                var kerbalData = FileHandler.ReadFile(k);
+                return new KerbalInfo
+                {
+                    KerbalData = kerbalData,
+                    NumBytes = kerbalData.Length,
+                    KerbalName = Path.GetFileNameWithoutExtension(k)
+                };
+            });
+
+            foreach(var kerbal in kerbalsData) {
+                Metrics.Kerbals.Info.WithLabels(kerbal.KerbalName).Set(1);
+            }
         }
     }
 }
