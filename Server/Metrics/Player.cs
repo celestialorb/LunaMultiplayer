@@ -1,5 +1,3 @@
-using Server.Log;
-
 namespace Server.Metrics {
   public static class Player {
     public static readonly Prometheus.Gauge Online = Prometheus.Metrics.CreateGauge(
