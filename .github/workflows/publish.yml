@@ -10,4 +10,4 @@ jobs:
         with:
           file: "Dockerfile_Server"
           push: true
-          tags: user/app:latest
+          tags: ghcr.io/celestialorb/LunaMultiplayer:latest
