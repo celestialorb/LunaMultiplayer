@@ -13,8 +13,13 @@ namespace Server.Settings.Definition
         [XmlComment(Value = "The endpoint to serve the Prometheus metrics on.")]
         public string Endpoint { get; set; } = "metrics";
 
-        // TODO: toggle-able detailed metrics
         [XmlComment(Value = "Whether or not to collect metrics on contracts.")]
         public bool EnableContractMetrics { get; set; } = false;
+
+        [XmlComment(Value = "Whether or not to collect vessel orientation metrics.")]
+        public bool EnableVesselOrientationMetrics { get; set; } = false;
+
+        [XmlComment(Value = "Whether or not to collect vessel part resource metrics.")]
+        public bool EnableVesselPartResourceMetrics { get; set; } = false;
     }
 }

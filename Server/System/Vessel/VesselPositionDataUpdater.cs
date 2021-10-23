@@ -65,6 +65,37 @@ namespace Server.System.Vessel
                         vessel.Orbit.Update("MNA", msgData.Orbit[5].ToString(CultureInfo.InvariantCulture));
                         vessel.Orbit.Update("EPH", msgData.Orbit[6].ToString(CultureInfo.InvariantCulture));
                         vessel.Orbit.Update("REF", msgData.Orbit[7].ToString(CultureInfo.InvariantCulture));
+
+                        string guid = msgData.VesselId.ToString();
+
+                        // Update the vessel epoch.
+                        Metrics.Vessel.Epoch.WithLabels(guid).Set(msgData.Orbit[7]);
+
+                        // Update the vessel position metrics.
+                        Metrics.VesselPosition.Latitude.WithLabels(guid).Set(msgData.LatLonAlt[0]);
+                        Metrics.VesselPosition.Longitude.WithLabels(guid).Set(msgData.LatLonAlt[1]);
+                        Metrics.VesselPosition.Altitude.WithLabels(guid).Set(msgData.LatLonAlt[2]);
+                        Metrics.VesselPosition.Height.WithLabels(guid).Set(msgData.HeightFromTerrain);
+
+                        // Update the vessel orbital metrics.
+                        Metrics.VesselOrbit.Inclination.WithLabels(guid).Set(msgData.Orbit[0]);
+                        Metrics.VesselOrbit.Eccentricity.WithLabels(guid).Set(msgData.Orbit[1]);
+                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(guid).Set(msgData.Orbit[2]);
+                        Metrics.VesselOrbit.LongitudeOfAscendingNode.WithLabels(guid).Set(msgData.Orbit[3]);
+                        Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(msgData.Orbit[4] - msgData.Orbit[3]);
+                        Metrics.VesselOrbit.MeanAnomaly.WithLabels(guid).Set(msgData.Orbit[5]);
+
+                        // Update the vessel orientation metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselOrientationMetrics) {
+                            Metrics.VesselOrientation.NormalX.WithLabels(guid).Set(msgData.NormalVector[0]);
+                            Metrics.VesselOrientation.NormalY.WithLabels(guid).Set(msgData.NormalVector[1]);
+                            Metrics.VesselOrientation.NormalZ.WithLabels(guid).Set(msgData.NormalVector[2]);
+
+                            Metrics.VesselOrientation.SurfaceRelativeW.WithLabels(guid).Set(msgData.SrfRelRotation[0]);
+                            Metrics.VesselOrientation.SurfaceRelativeX.WithLabels(guid).Set(msgData.SrfRelRotation[1]);
+                            Metrics.VesselOrientation.SurfaceRelativeY.WithLabels(guid).Set(msgData.SrfRelRotation[2]);
+                            Metrics.VesselOrientation.SurfaceRelativeZ.WithLabels(guid).Set(msgData.SrfRelRotation[3]);
+                        }
                     }
                 });
             }

@@ -36,6 +36,9 @@ namespace Server.System
                     FileHandler.FileDelete(Path.Combine(VesselsPath, $"{vesselId}{VesselFileFormat}"));
                 }
             });
+
+            // Remove the vessel from the metrics.
+            Metrics.Vessel.RemoveVessel(vesselId);
         }
 
         /// <summary>
@@ -59,7 +62,58 @@ namespace Server.System
                 {
                     if (Guid.TryParse(Path.GetFileNameWithoutExtension(file), out var vesselId))
                     {
-                        CurrentVessels.TryAdd(vesselId, new Vessel.Classes.Vessel(FileHandler.ReadFileText(file)));
+                        Vessel.Classes.Vessel vessel = new Vessel.Classes.Vessel(FileHandler.ReadFileText(file));
+                        CurrentVessels.TryAdd(vesselId, vessel);
+
+                        var guid = vesselId.ToString();
+
+                        // Add the vessel to our metrics.
+                        Metrics.Vessel.Info.WithLabels(
+                            guid,
+                            vessel.Fields.GetSingle("name").Value,
+                            vessel.Fields.GetSingle("sit").Value,
+                            vessel.Fields.GetSingle("type").Value
+                        ).IncTo(1);
+                        Metrics.Vessel.CurrentStage.WithLabels(guid).Set(int.Parse(vessel.Fields.GetSingle("stg").Value));
+                        Metrics.Vessel.DistanceTraveled.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("distanceTraveled").Value));
+
+                        // Add the vessel's epoch.
+                        Metrics.Vessel.Epoch.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("EPH").Value));
+
+                        // Add the vessel's position metrics.
+                        Metrics.VesselPosition.Latitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("lat").Value));
+                        Metrics.VesselPosition.Longitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("lon").Value));
+                        Metrics.VesselPosition.Altitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("alt").Value));
+                        Metrics.VesselPosition.Height.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("hgt").Value));
+
+                        // Add the vessel's orbit metrics.
+                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("SMA").Value));
+                        Metrics.VesselOrbit.Eccentricity.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("ECC").Value));
+                        Metrics.VesselOrbit.Inclination.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("INC").Value));
+                        Metrics.VesselOrbit.LongitudeOfAscendingNode.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("LAN").Value));
+                        Metrics.VesselOrbit.MeanAnomaly.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("MNA").Value));
+                        Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(
+                            double.Parse(vessel.Orbit.GetSingle("LPE").Value) - double.Parse(vessel.Orbit.GetSingle("LAN").Value)
+                        );
+
+                        // Add the vessel's orientation metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselOrientationMetrics) {
+                            var normal = vessel.Fields.GetSingle("nrm").Value.Split(",");
+                            Metrics.VesselOrientation.NormalX.WithLabels(guid).Set(double.Parse(normal[0]));
+                            Metrics.VesselOrientation.NormalY.WithLabels(guid).Set(double.Parse(normal[1]));
+                            Metrics.VesselOrientation.NormalZ.WithLabels(guid).Set(double.Parse(normal[2]));
+
+                            var surface = vessel.Fields.GetSingle("rot").Value.Split(",");
+                            Metrics.VesselOrientation.SurfaceRelativeW.WithLabels(guid).Set(double.Parse(surface[0]));
+                            Metrics.VesselOrientation.SurfaceRelativeX.WithLabels(guid).Set(double.Parse(surface[1]));
+                            Metrics.VesselOrientation.SurfaceRelativeY.WithLabels(guid).Set(double.Parse(surface[2]));
+                            Metrics.VesselOrientation.SurfaceRelativeZ.WithLabels(guid).Set(double.Parse(surface[3]));
+                        }
+
+                        // Add the vessel part's resource metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselPartResourceMetrics) {
+                            Metrics.VesselPartResource.Update();
+                        }
                     }
                 }
             }
