@@ -16,6 +16,9 @@ namespace Server.System
             //send the funds update to all other clients
             MessageQueuer.RelayMessage<ShareProgressSrvMsg>(client, data);
             ScenarioDataUpdater.WriteFundsDataToFile(data.Funds);
+
+            // Update metrics.
+            Metrics.Program.Funds.Set(data.Funds);
         }
     }
 }
