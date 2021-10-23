@@ -51,6 +51,11 @@ namespace Server.System
                 // Update various metrics.
                 Metrics.Technology.Update();
                 Metrics.Facility.Update();
+
+                // If we're configured to collect contract metrics, go ahead and initialize them.
+                if(Settings.Structures.MetricsSettings.SettingsStore.EnableContractMetrics) {
+                    Metrics.Contract.Update();
+                }
             }
         }
 

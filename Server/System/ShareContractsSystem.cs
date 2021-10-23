@@ -21,6 +21,11 @@ namespace Server.System
             //send the contract update to all other clients
             MessageQueuer.RelayMessage<ShareProgressSrvMsg>(client, data);
             ScenarioDataUpdater.WriteContractDataToFile(data);
+
+            // If we're configured to collect contract metrics, go ahead and recollect them.
+            if(Settings.Structures.MetricsSettings.SettingsStore.EnableContractMetrics) {
+                Metrics.Contract.Update();
+            }
         }
     }
 }
