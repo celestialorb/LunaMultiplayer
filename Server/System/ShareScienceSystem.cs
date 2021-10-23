@@ -16,6 +16,9 @@ namespace Server.System
             //send the science update to all other clients
             MessageQueuer.RelayMessage<ShareProgressSrvMsg>(client, data);
             ScenarioDataUpdater.WriteScienceDataToFile(data.Science);
+
+            // Update metrics.
+            Metrics.Program.Science.Set(data.Science);
         }
     }
 }
