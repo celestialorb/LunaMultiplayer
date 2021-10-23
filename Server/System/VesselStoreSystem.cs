@@ -72,6 +72,31 @@ namespace Server.System
                             vessel.Fields.GetSingle("sit").Value,
                             vessel.Fields.GetSingle("type").Value
                         ).IncTo(1);
+
+                        // Add the vessel's position metrics.
+                        Metrics.VesselPosition.Latitude.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Fields.GetSingle("lat").Value));
+                        Metrics.VesselPosition.Longitude.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Fields.GetSingle("lon").Value));
+                        Metrics.VesselPosition.Altitude.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Fields.GetSingle("alt").Value));
+                        Metrics.VesselPosition.Height.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Fields.GetSingle("hgt").Value));
+
+                        // Add the vessel's orbit metrics.
+                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Orbit.GetSingle("SMA").Value));
+                        Metrics.VesselOrbit.Eccentricity.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Orbit.GetSingle("ECC").Value));
+                        Metrics.VesselOrbit.Inclination.WithLabels(
+                            vesselId.ToString()
+                        ).Set(double.Parse(vessel.Orbit.GetSingle("INC").Value));
                     }
                 }
             }
