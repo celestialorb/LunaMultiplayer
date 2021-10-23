@@ -36,6 +36,9 @@ namespace Server.System
                     FileHandler.FileDelete(Path.Combine(VesselsPath, $"{vesselId}{VesselFileFormat}"));
                 }
             });
+
+            // Remove the vessel from the metrics.
+            Metrics.Vessel.RemoveVessel(vesselId);
         }
 
         /// <summary>
@@ -59,7 +62,16 @@ namespace Server.System
                 {
                     if (Guid.TryParse(Path.GetFileNameWithoutExtension(file), out var vesselId))
                     {
-                        CurrentVessels.TryAdd(vesselId, new Vessel.Classes.Vessel(FileHandler.ReadFileText(file)));
+                        Vessel.Classes.Vessel vessel = new Vessel.Classes.Vessel(FileHandler.ReadFileText(file));
+                        CurrentVessels.TryAdd(vesselId, vessel);
+
+                        // Add the vessel to our metrics.
+                        Metrics.Vessel.Info.WithLabels(
+                            vesselId.ToString(),
+                            vessel.Fields.GetSingle("name").Value,
+                            vessel.Fields.GetSingle("sit").Value,
+                            vessel.Fields.GetSingle("type").Value
+                        ).IncTo(1);
                     }
                 }
             }

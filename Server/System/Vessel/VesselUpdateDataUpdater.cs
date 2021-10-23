@@ -60,6 +60,20 @@ namespace Server.System.Vessel
                         vessel.Fields.Update("ctrl", msgData.WasControllable.ToString(CultureInfo.InvariantCulture));
                         vessel.Fields.Update("stg", msgData.Stage.ToString(CultureInfo.InvariantCulture));
 
+                        // Update the vessel metrics on change.
+                        Metrics.Vessel.DistanceTraveled.WithLabels(msgData.VesselId.ToString()).Set(msgData.DistanceTraveled);
+                        foreach(var labels in Metrics.Vessel.Info.GetAllLabelValues()) {
+                            if(labels[0] != msgData.VesselId.ToString()) { continue; }
+                            Metrics.Vessel.Info.RemoveLabelled(labels);
+                            break;
+                        }
+                        Metrics.Vessel.Info.WithLabels(
+                            msgData.VesselId.ToString(),
+                            msgData.Name,
+                            msgData.Situation,
+                            msgData.Type
+                        ).IncTo(1);
+
                         //NEVER! patch the CoM in the protovessel as then it will be drawn with incorrect CommNet lines!
                         //vessel.Fields.Update("CoM", $"{msgData.Com[0].ToString(CultureInfo.InvariantCulture)}," +
                         //                                $"{msgData.Com[1].ToString(CultureInfo.InvariantCulture)}," +
