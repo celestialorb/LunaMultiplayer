@@ -25,10 +25,10 @@ namespace Server.Metrics {
             new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
         );
 
-        public static readonly Prometheus.Counter StagingEvent = Prometheus.Metrics.CreateCounter(
-            "lmp_vessel_staging_event_timestamp",
-            "The timestamp in seconds from the UNIX epoch of a staging event for a vessel.",
-            new Prometheus.CounterConfiguration{LabelNames = new[] {"guid", "stage"}}
+        public static readonly Prometheus.Gauge CurrentStage = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_current_stage",
+            "The current stage of the vessel.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
         );
 
         public static void RemoveVessel(Guid id) {
@@ -41,6 +41,7 @@ namespace Server.Metrics {
 
             Epoch.RemoveLabelled(id.ToString());
             DistanceTraveled.RemoveLabelled(id.ToString());
+            CurrentStage.RemoveLabelled(id.ToString());
             VesselPosition.RemoveVessel(id);
             VesselOrbit.RemoveVessel(id);
             VesselOrientation.RemoveVessel(id);

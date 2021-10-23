@@ -42,16 +42,6 @@ namespace Server.System.Vessel
                     {
                         if (!VesselStoreSystem.CurrentVessels.TryGetValue(msgData.VesselId, out var vessel)) return;
 
-                        // Update the staging event metric if we detect one. A staging event occurs when the stage value DECREASES.
-                        int.TryParse(vessel.Fields.GetSingle("stg").Value, out int currentStage);
-                        if(msgData.Stage < currentStage) {
-                            // We have a staging event, we need to record it.
-                            Metrics.Vessel.StagingEvent.WithLabels(
-                                msgData.VesselId.ToString(),
-                                msgData.Stage.ToString()
-                            ).IncTo(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-                        }
-
                         vessel.Fields.Update("name", msgData.Name);
                         vessel.Fields.Update("type", msgData.Type);
                         vessel.Fields.Update("distanceTraveled", msgData.DistanceTraveled.ToString(CultureInfo.InvariantCulture));
@@ -71,14 +61,16 @@ namespace Server.System.Vessel
                         vessel.Fields.Update("stg", msgData.Stage.ToString(CultureInfo.InvariantCulture));
 
                         // Update the vessel metrics on change.
-                        Metrics.Vessel.DistanceTraveled.WithLabels(msgData.VesselId.ToString()).Set(msgData.DistanceTraveled);
+                        var guid = msgData.VesselId.ToString();
+                        Metrics.Vessel.CurrentStage.WithLabels(guid).Set(msgData.Stage);
+                        Metrics.Vessel.DistanceTraveled.WithLabels(guid).Set(msgData.DistanceTraveled);
                         foreach(var labels in Metrics.Vessel.Info.GetAllLabelValues()) {
-                            if(labels[0] != msgData.VesselId.ToString()) { continue; }
+                            if(labels[0] != guid) { continue; }
                             Metrics.Vessel.Info.RemoveLabelled(labels);
                             break;
                         }
                         Metrics.Vessel.Info.WithLabels(
-                            msgData.VesselId.ToString(),
+                            guid,
                             msgData.Name,
                             msgData.Situation,
                             msgData.Type
