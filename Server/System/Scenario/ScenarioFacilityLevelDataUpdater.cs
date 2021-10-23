@@ -18,6 +18,9 @@ namespace Server.System.Scenario
 
                     var facilityNode = scenario.GetNode(facilityId).Value;
                     facilityNode?.UpdateValue("lvl", level.ToString(CultureInfo.InvariantCulture));
+
+                    // Update the facility metrics.
+                    Metrics.Facility.Update();
                 }
             });
         }

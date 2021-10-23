@@ -47,6 +47,8 @@ namespace Server.System
                     ScenarioDataUpdater.WriteReputationDataToFile(GameplaySettings.SettingsStore.StartingReputation);
                     ScenarioDataUpdater.WriteFundsDataToFile(GameplaySettings.SettingsStore.StartingFunds);
                 }
+
+                Metrics.Facility.Update();
             }
         }
 
