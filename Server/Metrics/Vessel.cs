@@ -19,6 +19,12 @@ namespace Server.Metrics {
             new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
         );
 
+        public static readonly Prometheus.Counter StagingEvent = Prometheus.Metrics.CreateCounter(
+            "lmp_vessel_staging_event_timestamp",
+            "The timestamp in seconds from the UNIX epoch of a staging event for a vessel.",
+            new Prometheus.CounterConfiguration{LabelNames = new[] {"guid", "stage"}}
+        );
+
         public static void RemoveVessel(Guid id) {
             foreach(var labels in Info.GetAllLabelValues()) {
                 if(labels[0] != id.ToString()) { continue; }
