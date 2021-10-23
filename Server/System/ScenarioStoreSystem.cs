@@ -48,8 +48,9 @@ namespace Server.System
                     ScenarioDataUpdater.WriteFundsDataToFile(GameplaySettings.SettingsStore.StartingFunds);
                 }
 
-                // Update the technology metrics.
+                // Update various metrics.
                 Metrics.Technology.Update();
+                Metrics.Facility.Update();
             }
         }
 
