@@ -66,8 +66,12 @@ namespace Server.System.Vessel
                         vessel.Orbit.Update("EPH", msgData.Orbit[6].ToString(CultureInfo.InvariantCulture));
                         vessel.Orbit.Update("REF", msgData.Orbit[7].ToString(CultureInfo.InvariantCulture));
 
-                        // Update the vessel position metrics.
                         string guid = msgData.VesselId.ToString();
+
+                        // Update the vessel epoch.
+                        Metrics.Vessel.Epoch.WithLabels(guid).Set(msgData.Orbit[7]);
+
+                        // Update the vessel position metrics.
                         Metrics.VesselPosition.Latitude.WithLabels(guid).Set(msgData.LatLonAlt[0]);
                         Metrics.VesselPosition.Longitude.WithLabels(guid).Set(msgData.LatLonAlt[1]);
                         Metrics.VesselPosition.Altitude.WithLabels(guid).Set(msgData.LatLonAlt[2]);
@@ -77,6 +81,9 @@ namespace Server.System.Vessel
                         Metrics.VesselOrbit.Inclination.WithLabels(guid).Set(msgData.Orbit[0]);
                         Metrics.VesselOrbit.Eccentricity.WithLabels(guid).Set(msgData.Orbit[1]);
                         Metrics.VesselOrbit.SemimajorAxis.WithLabels(guid).Set(msgData.Orbit[2]);
+                        Metrics.VesselOrbit.LongitudeOfAscendingNode.WithLabels(guid).Set(msgData.Orbit[3]);
+                        Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(msgData.Orbit[4] - msgData.Orbit[3]);
+                        Metrics.VesselOrbit.MeanAnomaly.WithLabels(guid).Set(msgData.Orbit[5]);
                     }
                 });
             }

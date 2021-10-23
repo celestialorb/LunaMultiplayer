@@ -13,6 +13,12 @@ namespace Server.Metrics {
             }}
         );
 
+        public static readonly Prometheus.Gauge Epoch = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_epoch_seconds",
+            "The vessel's epoch.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
         public static readonly Prometheus.Gauge DistanceTraveled = Prometheus.Metrics.CreateGauge(
             "lmp_vessel_distance_traveled_meters",
             "The total distance traveled by the vessel.",
@@ -33,6 +39,7 @@ namespace Server.Metrics {
                 break;
             }
 
+            Epoch.RemoveLabelled(id.ToString());
             DistanceTraveled.RemoveLabelled(id.ToString());
             VesselPosition.RemoveVessel(id);
             VesselOrbit.RemoveVessel(id);
@@ -91,10 +98,31 @@ namespace Server.Metrics {
             new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
         );
 
+        public static readonly Prometheus.Gauge LongitudeOfAscendingNode = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_longitude_of_ascending_node_degrees",
+            "The longitude of the ascending node of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge ArgumentOfPeriapsis = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_argument_of_periapsis_degrees",
+            "The argument of periapsis of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge MeanAnomaly = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_mean_anomaly_radians",
+            "The mean anomaly of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
         public static void RemoveVessel(Guid id) {
             SemimajorAxis.RemoveLabelled(id.ToString());
             Inclination.RemoveLabelled(id.ToString());
             Eccentricity.RemoveLabelled(id.ToString());
+            LongitudeOfAscendingNode.RemoveLabelled(id.ToString());
+            ArgumentOfPeriapsis.RemoveLabelled(id.ToString());
+            MeanAnomaly.RemoveLabelled(id.ToString());
         }
     }
 }

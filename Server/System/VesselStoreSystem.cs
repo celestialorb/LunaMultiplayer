@@ -65,38 +65,34 @@ namespace Server.System
                         Vessel.Classes.Vessel vessel = new Vessel.Classes.Vessel(FileHandler.ReadFileText(file));
                         CurrentVessels.TryAdd(vesselId, vessel);
 
+                        var guid = vesselId.ToString();
+
                         // Add the vessel to our metrics.
                         Metrics.Vessel.Info.WithLabels(
-                            vesselId.ToString(),
+                            guid,
                             vessel.Fields.GetSingle("name").Value,
                             vessel.Fields.GetSingle("sit").Value,
                             vessel.Fields.GetSingle("type").Value
                         ).IncTo(1);
 
+                        // Add the vessel's epoch.
+                        Metrics.Vessel.Epoch.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("EPH").Value));
+
                         // Add the vessel's position metrics.
-                        Metrics.VesselPosition.Latitude.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Fields.GetSingle("lat").Value));
-                        Metrics.VesselPosition.Longitude.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Fields.GetSingle("lon").Value));
-                        Metrics.VesselPosition.Altitude.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Fields.GetSingle("alt").Value));
-                        Metrics.VesselPosition.Height.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Fields.GetSingle("hgt").Value));
+                        Metrics.VesselPosition.Latitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("lat").Value));
+                        Metrics.VesselPosition.Longitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("lon").Value));
+                        Metrics.VesselPosition.Altitude.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("alt").Value));
+                        Metrics.VesselPosition.Height.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("hgt").Value));
 
                         // Add the vessel's orbit metrics.
-                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Orbit.GetSingle("SMA").Value));
-                        Metrics.VesselOrbit.Eccentricity.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Orbit.GetSingle("ECC").Value));
-                        Metrics.VesselOrbit.Inclination.WithLabels(
-                            vesselId.ToString()
-                        ).Set(double.Parse(vessel.Orbit.GetSingle("INC").Value));
+                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("SMA").Value));
+                        Metrics.VesselOrbit.Eccentricity.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("ECC").Value));
+                        Metrics.VesselOrbit.Inclination.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("INC").Value));
+                        Metrics.VesselOrbit.LongitudeOfAscendingNode.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("LAN").Value));
+                        Metrics.VesselOrbit.MeanAnomaly.WithLabels(guid).Set(double.Parse(vessel.Orbit.GetSingle("MNA").Value));
+                        Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(
+                            double.Parse(vessel.Orbit.GetSingle("LPE").Value) - double.Parse(vessel.Orbit.GetSingle("LAN").Value)
+                        );
                     }
                 }
             }
