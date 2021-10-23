@@ -84,6 +84,18 @@ namespace Server.System.Vessel
                         Metrics.VesselOrbit.LongitudeOfAscendingNode.WithLabels(guid).Set(msgData.Orbit[3]);
                         Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(msgData.Orbit[4] - msgData.Orbit[3]);
                         Metrics.VesselOrbit.MeanAnomaly.WithLabels(guid).Set(msgData.Orbit[5]);
+
+                        // Update the vessel orientation metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselOrientationMetrics) {
+                            Metrics.VesselOrientation.NormalX.WithLabels(guid).Set(msgData.NormalVector[0]);
+                            Metrics.VesselOrientation.NormalY.WithLabels(guid).Set(msgData.NormalVector[1]);
+                            Metrics.VesselOrientation.NormalZ.WithLabels(guid).Set(msgData.NormalVector[2]);
+
+                            Metrics.VesselOrientation.SurfaceRelativeW.WithLabels(guid).Set(msgData.SrfRelRotation[0]);
+                            Metrics.VesselOrientation.SurfaceRelativeX.WithLabels(guid).Set(msgData.SrfRelRotation[1]);
+                            Metrics.VesselOrientation.SurfaceRelativeY.WithLabels(guid).Set(msgData.SrfRelRotation[2]);
+                            Metrics.VesselOrientation.SurfaceRelativeZ.WithLabels(guid).Set(msgData.SrfRelRotation[3]);
+                        }
                     }
                 });
             }

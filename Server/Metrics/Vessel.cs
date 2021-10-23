@@ -43,6 +43,7 @@ namespace Server.Metrics {
             DistanceTraveled.RemoveLabelled(id.ToString());
             VesselPosition.RemoveVessel(id);
             VesselOrbit.RemoveVessel(id);
+            VesselOrientation.RemoveVessel(id);
         }
     }
 
@@ -123,6 +124,61 @@ namespace Server.Metrics {
             LongitudeOfAscendingNode.RemoveLabelled(id.ToString());
             ArgumentOfPeriapsis.RemoveLabelled(id.ToString());
             MeanAnomaly.RemoveLabelled(id.ToString());
+        }
+    }
+
+    public class VesselOrientation {
+        public static readonly Prometheus.Gauge NormalX = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_normal_x",
+            "The x-component of the vessel's normal vector.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge NormalY = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_normal_y",
+            "The y-component of the vessel's normal vector.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge NormalZ = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_normal_z",
+            "The z-component of the vessel's normal vector.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge SurfaceRelativeW = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_surface_w",
+            "The w-component of the vessel's surface-relative quaternion orientation.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge SurfaceRelativeX = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_surface_x",
+            "The x-component of the vessel's surface-relative quaternion orientation.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge SurfaceRelativeY = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_surface_y",
+            "The y-component of the vessel's surface-relative quaternion orientation.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge SurfaceRelativeZ = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orientation_surface_z",
+            "The z-component of the vessel's surface-relative quaternion orientation.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static void RemoveVessel(Guid id) {
+            NormalX.RemoveLabelled(id.ToString());
+            NormalY.RemoveLabelled(id.ToString());
+            NormalZ.RemoveLabelled(id.ToString());
+
+            SurfaceRelativeW.RemoveLabelled(id.ToString());
+            SurfaceRelativeX.RemoveLabelled(id.ToString());
+            SurfaceRelativeY.RemoveLabelled(id.ToString());
+            SurfaceRelativeZ.RemoveLabelled(id.ToString());
         }
     }
 }

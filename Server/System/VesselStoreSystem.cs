@@ -93,6 +93,20 @@ namespace Server.System
                         Metrics.VesselOrbit.ArgumentOfPeriapsis.WithLabels(guid).Set(
                             double.Parse(vessel.Orbit.GetSingle("LPE").Value) - double.Parse(vessel.Orbit.GetSingle("LAN").Value)
                         );
+
+                        // Add the vessel's orientation metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselOrientationMetrics) {
+                            var normal = vessel.Fields.GetSingle("nrm").Value.Split(",");
+                            Metrics.VesselOrientation.NormalX.WithLabels(guid).Set(double.Parse(normal[0]));
+                            Metrics.VesselOrientation.NormalY.WithLabels(guid).Set(double.Parse(normal[1]));
+                            Metrics.VesselOrientation.NormalZ.WithLabels(guid).Set(double.Parse(normal[2]));
+
+                            var surface = vessel.Fields.GetSingle("rot").Value.Split(",");
+                            Metrics.VesselOrientation.SurfaceRelativeW.WithLabels(guid).Set(double.Parse(surface[0]));
+                            Metrics.VesselOrientation.SurfaceRelativeX.WithLabels(guid).Set(double.Parse(surface[1]));
+                            Metrics.VesselOrientation.SurfaceRelativeY.WithLabels(guid).Set(double.Parse(surface[2]));
+                            Metrics.VesselOrientation.SurfaceRelativeZ.WithLabels(guid).Set(double.Parse(surface[3]));
+                        }
                     }
                 }
             }
