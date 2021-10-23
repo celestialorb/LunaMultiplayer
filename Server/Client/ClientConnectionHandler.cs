@@ -21,8 +21,6 @@ namespace Server.Client
 
             ServerContext.Clients.TryAdd(newClientObject.Endpoint, newClientObject);
             LunaLog.Debug($"Online Players: {ServerContext.PlayerCount}, connected: {ServerContext.Clients.Count}");
-
-            Metrics.Player.Online.WithLabels(newClientObject.PlayerName).Set(1);
         }
 
         public static void DisconnectClient(ClientStructure client, string reason = "")
