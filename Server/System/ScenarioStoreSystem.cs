@@ -47,6 +47,11 @@ namespace Server.System
                     ScenarioDataUpdater.WriteReputationDataToFile(GameplaySettings.SettingsStore.StartingReputation);
                     ScenarioDataUpdater.WriteFundsDataToFile(GameplaySettings.SettingsStore.StartingFunds);
                 }
+
+                // If we're configured to collect contract metrics, go ahead and initialize them.
+                if(Settings.Structures.MetricsSettings.SettingsStore.EnableContractMetrics) {
+                    Metrics.Contract.Update();
+                }
             }
         }
 

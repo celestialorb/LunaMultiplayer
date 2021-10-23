@@ -14,5 +14,7 @@ namespace Server.Settings.Definition
         public string Endpoint { get; set; } = "metrics";
 
         // TODO: toggle-able detailed metrics
+        [XmlComment(Value = "Whether or not to collect metrics on contracts.")]
+        public bool EnableContractMetrics { get; set; } = false;
     }
 }
