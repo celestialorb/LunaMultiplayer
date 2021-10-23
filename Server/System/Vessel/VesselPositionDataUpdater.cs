@@ -72,6 +72,11 @@ namespace Server.System.Vessel
                         Metrics.VesselPosition.Longitude.WithLabels(guid).Set(msgData.LatLonAlt[1]);
                         Metrics.VesselPosition.Altitude.WithLabels(guid).Set(msgData.LatLonAlt[2]);
                         Metrics.VesselPosition.Height.WithLabels(guid).Set(msgData.HeightFromTerrain);
+
+                        // Update the vessel orbital metrics.
+                        Metrics.VesselOrbit.Inclination.WithLabels(guid).Set(msgData.Orbit[0]);
+                        Metrics.VesselOrbit.Eccentricity.WithLabels(guid).Set(msgData.Orbit[1]);
+                        Metrics.VesselOrbit.SemimajorAxis.WithLabels(guid).Set(msgData.Orbit[2]);
                     }
                 });
             }

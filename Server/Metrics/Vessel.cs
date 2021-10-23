@@ -35,6 +35,7 @@ namespace Server.Metrics {
 
             DistanceTraveled.RemoveLabelled(id.ToString());
             VesselPosition.RemoveVessel(id);
+            VesselOrbit.RemoveVessel(id);
         }
     }
 
@@ -68,6 +69,32 @@ namespace Server.Metrics {
             Longitude.RemoveLabelled(id.ToString());
             Altitude.RemoveLabelled(id.ToString());
             Height.RemoveLabelled(id.ToString());
+        }
+    }
+
+    public class VesselOrbit {
+        public static readonly Prometheus.Gauge SemimajorAxis = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_semimajor_axis_meters",
+            "The length of the semimajor axis of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge Inclination = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_inclination_degrees",
+            "The inclination of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static readonly Prometheus.Gauge Eccentricity = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_orbit_eccentricity",
+            "The eccentricity of the vessel's orbit.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {"guid"}}
+        );
+
+        public static void RemoveVessel(Guid id) {
+            SemimajorAxis.RemoveLabelled(id.ToString());
+            Inclination.RemoveLabelled(id.ToString());
+            Eccentricity.RemoveLabelled(id.ToString());
         }
     }
 }
