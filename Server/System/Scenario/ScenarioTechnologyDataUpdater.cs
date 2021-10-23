@@ -27,6 +27,9 @@ namespace Server.System.Scenario
                     if (specificTechNode != null) return; //The science node already exists so quit
 
                     scenario.AddNode(receivedNode);
+
+                    // Update the technology metrics.
+                    Metrics.Technology.Update();
                 }
             });
         }
