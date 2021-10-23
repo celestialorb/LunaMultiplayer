@@ -45,6 +45,9 @@ namespace Server.System
             if (subspaceToRemove == WarpContext.LatestSubspace.Id)
                 return false;
 
+            // Remove the metrics for the subspace.
+            Metrics.Subspace.RemoveSubspace(subspaceToRemove);
+
             LunaLog.Debug($"Removing abandoned subspace '{subspaceToRemove}'");
             WarpContext.Subspaces.TryRemove(subspaceToRemove, out _);
             return true;
@@ -65,6 +68,14 @@ namespace Server.System
                 LunaLog.Debug("Creating new subspace file");
                 WarpContext.Subspaces.TryAdd(0, new Subspace(0));
                 WarpContext.NextSubspaceId = 1;
+            }
+
+            // Populate the subspace metrics.
+            foreach(var subspace in WarpContext.Subspaces) {
+                Metrics.Subspace.TimeDelta.WithLabels(
+                    subspace.Value.Id.ToString(),
+                    subspace.Value.Creator
+                ).Set(subspace.Value.Time);
             }
         }
 

@@ -30,6 +30,12 @@ namespace Server.System
 
                 MessageQueuer.SendToAllClients<WarpSrvMsg>(msgData);
                 WarpContext.NextSubspaceId++;
+
+                // Add the subspace to the metrics.
+                Metrics.Subspace.TimeDelta.WithLabels(
+                    msgData.SubspaceKey.ToString(),
+                    msgData.PlayerCreator
+                ).Set(message.ServerTimeDifference);
             }
         }
 
