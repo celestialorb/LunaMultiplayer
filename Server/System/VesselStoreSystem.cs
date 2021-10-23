@@ -109,6 +109,11 @@ namespace Server.System
                             Metrics.VesselOrientation.SurfaceRelativeY.WithLabels(guid).Set(double.Parse(surface[2]));
                             Metrics.VesselOrientation.SurfaceRelativeZ.WithLabels(guid).Set(double.Parse(surface[3]));
                         }
+
+                        // Add the vessel part's resource metrics if we're configured to do so.
+                        if(Settings.Structures.MetricsSettings.SettingsStore.EnableVesselPartResourceMetrics) {
+                            Metrics.VesselPartResource.Update();
+                        }
                     }
                 }
             }

@@ -53,6 +53,17 @@ namespace Server.System.Vessel
                                 {
                                     resourceNode.UpdateValue("amount", resource.Amount.ToString(CultureInfo.InvariantCulture));
                                     resourceNode.UpdateValue("flowState", resource.FlowState.ToString(CultureInfo.InvariantCulture));
+
+                                    Metrics.VesselPartResource.Amount.WithLabels(
+                                        msgData.VesselId.ToString(),
+                                        resource.PartFlightId.ToString(),
+                                        resource.ResourceName
+                                    ).Set(resource.Amount);
+                                    Metrics.VesselPartResource.FlowState.WithLabels(
+                                        msgData.VesselId.ToString(),
+                                        resource.PartFlightId.ToString(),
+                                        resource.ResourceName
+                                    ).Set(resource.FlowState ? 1 : 0);
                                 }
                             }
                         }

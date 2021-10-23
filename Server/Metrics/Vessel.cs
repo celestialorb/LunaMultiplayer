@@ -45,6 +45,7 @@ namespace Server.Metrics {
             VesselPosition.RemoveVessel(id);
             VesselOrbit.RemoveVessel(id);
             VesselOrientation.RemoveVessel(id);
+            VesselPartResource.RemoveVessel(id);
         }
     }
 
@@ -180,6 +181,74 @@ namespace Server.Metrics {
             SurfaceRelativeX.RemoveLabelled(id.ToString());
             SurfaceRelativeY.RemoveLabelled(id.ToString());
             SurfaceRelativeZ.RemoveLabelled(id.ToString());
+        }
+    }
+
+    public class VesselPartResource {
+        public static readonly Prometheus.Gauge Amount = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_part_resource_amount",
+            "The current amount of a resource in the vessel part.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {
+                "vessel",
+                "part",
+                "resource"
+            }}
+        );
+
+        public static readonly Prometheus.Gauge Capacity = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_part_resource_capacity",
+            "The resource capacity for a vessel part.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {
+                "vessel",
+                "part",
+                "resource"
+            }}
+        );
+
+        public static readonly Prometheus.Gauge FlowState = Prometheus.Metrics.CreateGauge(
+            "lmp_vessel_part_resource_flow_state",
+            "The current state of the resource flow for a vessel part.",
+            new Prometheus.GaugeConfiguration{LabelNames = new[] {
+                "vessel",
+                "part",
+                "resource"
+            }}
+        );
+
+        public static void Update() {
+            foreach(var vessel in System.VesselStoreSystem.CurrentVessels) {
+                UpdateVessel(vessel.Key);
+            }
+        }
+
+        public static void UpdateVessel(Guid id) {
+            RemoveVessel(id);
+
+            System.VesselStoreSystem.CurrentVessels.TryGetValue(id, out var vessel);
+
+            foreach(var part in vessel.Parts.GetAll()) {
+                foreach(var resource in part.Value.Resources.GetAll()) {
+                    var labels = new[] {
+                        id.ToString(),
+                        part.Key.ToString(),
+                        resource.Key
+                    };
+
+                    Amount.WithLabels(labels).Set(double.Parse(resource.Value.GetValue("amount").Value));
+                    Capacity.WithLabels(labels).Set(double.Parse(resource.Value.GetValue("maxAmount").Value));
+                    FlowState.WithLabels(labels).Set(bool.Parse(resource.Value.GetValue("flowState").Value) ? 1 : 0);
+                }
+            }
+        }
+
+        public static void RemoveVessel(Guid id) {
+            foreach(var labels in FlowState.GetAllLabelValues()) {
+                if(labels[0] != id.ToString()) { continue; }
+
+                Amount.RemoveLabelled(labels);
+                Capacity.RemoveLabelled(labels);
+                FlowState.RemoveLabelled(labels);
+            }
         }
     }
 }

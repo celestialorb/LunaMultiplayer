@@ -76,6 +76,8 @@ namespace Server.System.Vessel
                             msgData.Type
                         ).IncTo(1);
 
+                        Metrics.VesselPartResource.Update();
+
                         //NEVER! patch the CoM in the protovessel as then it will be drawn with incorrect CommNet lines!
                         //vessel.Fields.Update("CoM", $"{msgData.Com[0].ToString(CultureInfo.InvariantCulture)}," +
                         //                                $"{msgData.Com[1].ToString(CultureInfo.InvariantCulture)}," +

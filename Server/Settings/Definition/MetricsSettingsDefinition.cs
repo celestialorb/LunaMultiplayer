@@ -16,5 +16,8 @@ namespace Server.Settings.Definition
         // TODO: toggle-able detailed metrics
         [XmlComment(Value = "Whether or not to collect vessel orientation metrics.")]
         public bool EnableVesselOrientationMetrics { get; set; } = false;
+
+        [XmlComment(Value = "Whether or not to collect vessel part resource metrics.")]
+        public bool EnableVesselPartResourceMetrics { get; set; } = false;
     }
 }
