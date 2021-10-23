@@ -30,6 +30,9 @@ namespace Server.System
             FileHandler.WriteToFile(path, data.Kerbal.KerbalData, data.Kerbal.NumBytes);
 
             MessageQueuer.RelayMessage<KerbalSrvMsg>(client, data);
+
+            // Update our Kerbal metrics.
+            Metrics.Kerbal.Update();
         }
 
         public static void HandleKerbalsRequest(ClientStructure client)
@@ -62,6 +65,9 @@ namespace Server.System
             FileHandler.FileDelete(Path.Combine(KerbalsPath, $"{kerbalToRemove}.txt"));
 
             MessageQueuer.RelayMessage<KerbalSrvMsg>(client, message);
+
+            // Update our Kerbal metrics.
+            Metrics.Kerbal.Update();
         }
     }
 }

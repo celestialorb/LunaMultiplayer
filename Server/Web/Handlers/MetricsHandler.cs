@@ -20,6 +20,9 @@ namespace Server.Web.Handlers {
 
       // Populate the build info metric.
       BuildInfo.WithLabels(LmpVersioning.CurrentVersion.ToString()).Set(1);
+
+      // Update our Kerbal metrics on start.
+      Metrics.Kerbal.Update();
     }
 
     public Task Handle(IHttpContext context, Func<Task> next) {
