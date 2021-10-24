@@ -9,7 +9,8 @@ namespace Server.Metrics {
                 "guid",
                 "name",
                 "situation",
-                "type"
+                "type",
+                "target_body"
             }}
         );
 

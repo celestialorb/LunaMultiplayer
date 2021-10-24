@@ -73,7 +73,8 @@ namespace Server.System.Vessel
                             guid,
                             msgData.Name,
                             msgData.Situation,
-                            msgData.Type
+                            msgData.Type,
+                            Metrics.Utilities.GetCelestialBodyName(int.Parse(vessel.Orbit.GetSingle("REF").Value))
                         ).IncTo(1);
 
                         Metrics.VesselPartResource.Update();

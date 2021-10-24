@@ -72,7 +72,8 @@ namespace Server.System
                             guid,
                             vessel.Fields.GetSingle("name").Value,
                             vessel.Fields.GetSingle("sit").Value,
-                            vessel.Fields.GetSingle("type").Value
+                            vessel.Fields.GetSingle("type").Value,
+                            Metrics.Utilities.GetCelestialBodyName(int.Parse(vessel.Orbit.GetSingle("REF").Value))
                         ).IncTo(1);
                         Metrics.Vessel.CurrentStage.WithLabels(guid).Set(int.Parse(vessel.Fields.GetSingle("stg").Value));
                         Metrics.Vessel.DistanceTraveled.WithLabels(guid).Set(double.Parse(vessel.Fields.GetSingle("distanceTraveled").Value));
