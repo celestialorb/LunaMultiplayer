@@ -34,7 +34,8 @@ namespace Server.Metrics {
                     }
                 }
 
-                Log.LunaLog.Debug(contract.GetValue("targetBody").Value);
+                Log.LunaLog.Debug(contract.GetValue("targetBody").Value ?? "-1");
+                Log.LunaLog.Debug(int.Parse(contract.GetValue("targetBody").Value ?? "-1").ToString());
 
                 // Readd the metric.
                 Info.WithLabels(
