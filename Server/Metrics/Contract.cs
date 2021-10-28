@@ -34,8 +34,10 @@ namespace Server.Metrics {
                     }
                 }
 
-                Log.LunaLog.Debug(contract?.GetValue("targetBody")?.Value ?? "-1");
-                Log.LunaLog.Debug(int.Parse(contract?.GetValue("targetBody")?.Value ?? "-1").ToString());
+                var target_body_name = "None";
+                if(int.TryParse(contract?.GetValue("targetBody")?.Value ?? "-1", out var target_body)) {
+                    target_body_name = Utilities.GetCelestialBodyName(target_body);
+                }
 
                 // Readd the metric.
                 Info.WithLabels(
@@ -46,7 +48,7 @@ namespace Server.Metrics {
                     contract.GetValue("agent").Value,
                     contract.GetValue("deadlineType").Value,
                     contract.GetValue("expiryType").Value,
-                    Utilities.GetCelestialBodyName(int.Parse(contract?.GetValue("targetBody")?.Value ?? "-1"))
+                    target_body_name
                 ).IncTo(1);
             }
         }
